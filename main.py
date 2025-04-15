@@ -3,15 +3,22 @@ from flask import Flask
 
 app = Flask(__name__)
 
-# 아주 기본적인 응답 경로
 @app.route('/')
 def hello():
-    print("Root path requested!") # 요청이 오는지 확인용 로그
+    print("Root path requested!")
     return "Minimal Flask App is Running!"
 
+# 프로그램이 직접 실행될 때 웹 서버 시작
 if __name__ == "__main__":
+    # --- 이 블록이 실행되는지 확인하기 위한 로그 ---
+    print("--- INSIDE __name__ == '__main__' BLOCK ---")
+    # ----------------------------------------------
     port = int(os.environ.get("PORT", 8080))
-    print(f"--- Starting Minimal Flask App on port {port} ---") # 시작 로그 추가
-    # 디버그 모드는 Cloud Run에서 보통 사용하지 않음
+    print(f"--- Starting Minimal Flask App on port {port} ---")
     app.run(host='0.0.0.0', port=port)
-    print("--- Flask App should be running now ---") # app.run()은 보통 블로킹되어 이 줄은 실행 안됨
+    # app.run()이 정상 작동하면 아래 로그는 보통 보이지 않음
+    print("--- Flask App supposedly stopped ---")
+else:
+    # --- 스크립트가 임포트되었을 경우 확인 (참고용) ---
+    print(f"--- SCRIPT LOADED, BUT __name__ IS: {__name__} ---")
+    # ----------------------------------------------------
