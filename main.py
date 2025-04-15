@@ -13,7 +13,10 @@ def handle_chat_event_logic(event):
     event_type = event.get('type')
 
     if event_type == 'MESSAGE':
+        # --- 여기가 챗봇의 응답을 결정하는 부분 ---
+        # 지금은 항상 같은 메시지를 보내지만, 나중에 Vertex AI 로직을 넣을 수 있습니다.
         response_text = "테스트 완료되었습니다. 질문 감사합니다."
+        # ---------------------------------------
         response = {'text': response_text}
         # Flask에서는 jsonify를 사용하거나 직접 json.dumps 결과를 Response 객체로 반환할 수 있습니다.
         # 여기서는 간단히 딕셔너리를 jsonify로 변환하여 반환합니다.
@@ -34,6 +37,7 @@ def handle_post_request():
     # 요청 본문(body)에서 JSON 데이터 가져오기
     event_data = request.get_json()
     if not event_data:
+        print("Error: No data received or not JSON") # 오류 로그 추가
         return jsonify({'error': 'No data received or not JSON'}), 400
 
     # 챗봇 로직 함수 호출하고 결과 반환
@@ -43,5 +47,6 @@ def handle_post_request():
 if __name__ == "__main__":
     # Cloud Run이 제공하는 PORT 환경 변수 가져오기 (없으면 기본값 8080)
     port = int(os.environ.get("PORT", 8080))
+    print(f"--- Starting Flask App on port {port} ---") # 시작 로그 추가
     # 서버 실행: host='0.0.0.0' 은 컨테이너 외부에서 접근 가능하게 함
     app.run(host='0.0.0.0', port=port)
