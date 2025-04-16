@@ -1,47 +1,45 @@
 import os
 import json
-import traceback # 오류 상세 출력을 위해 추가
+import traceback
 from flask import Flask, request, jsonify
 
-# Flask 앱 만들기
+print("--- [DEBUG] main.py script started ---") # 스크립트 시작 로그
+
+print("--- [DEBUG] Creating Flask app instance ---")
 app = Flask(__name__)
+print("--- [DEBUG] Flask app instance created ---")
 
-# --- 로직 함수 정의가 먼저 와야 합니다 ---
-def handle_chat_event_logic(event):
-    """Google Chat 이벤트 로직 처리"""
-    # 로그 기록 (보안을 위해 실제 운영에서는 민감 정보 필터링 필요)
-    print(f"Received event: {json.dumps(event, indent=2)}")
-
-    event_type = event.get('type')
-
-    if event_type == 'MESSAGE':
-        # --- 여기가 챗봇의 응답을 결정하는 부분 ---
-        # 지금은 항상 같은 메시지를 보내지만, 나중에 Vertex AI 로직을 넣을 수 있습니다.
-        response_text = "테스트 완료되었습니다. 질문 감사합니다."
-        # ---------------------------------------
-        response = {'text': response_text}
-        return jsonify(response)
-
-    elif event_type == 'ADDED_TO_SPACE' or event_type == 'REMOVED_FROM_SPACE':
-        print(f"Bot was {event_type}")
-        return jsonify({}) # 빈 응답
-
-    else:
-        print(f"Ignoring event type: {event_type}")
-        return jsonify({}) # 빈 응답
-
-# --- 로직 함수 정의 후에 라우트 정의 ---
+# 라우트 정의 직전/직후에 로그 추가
+print("--- [DEBUG] Attempting to define route for POST / ---")
 @app.route('/', methods=['POST'])
 def handle_post_request():
-    print("--- POST request received at '/' endpoint! ---")
-    # 요청 처리 로직 없이 그냥 성공 응답만 반환
-    return jsonify({'status': 'POST request received successfully'}), 200
+    print("--- POST request received at '/' endpoint! (Simplified Handler) ---")
+    return jsonify({'status': 'POST received successfully'}), 200
+# 이 로그가 시작 로그에 나타나는지 확인!
+print("--- [DEBUG] Route for POST / defined successfully? ---")
 
-# --- 메인 실행 블록 ---
+# 혹시 모를 GET 라우트도 추가해서 비교 (선택 사항)
+# print("--- [DEBUG] Attempting to define route for GET / ---")
+# @app.route('/', methods=['GET'])
+# def handle_get_request():
+#     print("--- GET request received at '/' endpoint! ---")
+#     return "Hello from GET request!", 200
+# print("--- [DEBUG] Route for GET / defined successfully? ---")
+
+
+print("--- [DEBUG] Checking if running as main script ---")
 if __name__ == "__main__":
-    # Cloud Run이 제공하는 PORT 환경 변수 가져오기 (없으면 기본값 8080)
-    port = int(os.environ.get("PORT", 8080))
-    print(f"--- Starting Flask App on host 0.0.0.0 port {port} ---") # 시작 로그 추가
-    # 서버 실행: host='0.0.0.0' 은 컨테이너 외부에서 접근 가능하게 함
-    # debug=True는 개발 중에 유용하지만, 운영 환경에서는 False로 설정하거나 제거하는 것이 좋습니다.
-    app.run(host='0.0.0.0', port=port) # debug=True 제거 권장
+    print("--- [DEBUG] Inside __main__ block ---")
+    try:
+        port = int(os.environ.get("PORT", 8080))
+        print(f"--- [DEBUG] Starting Flask server on 0.0.0.0:{port} ---")
+        # 운영 환경에서는 debug=False 권장
+        app.run(host='0.0.0.0', port=port)
+        print("--- [DEBUG] app.run finished (should not happen normally) ---")
+    except Exception as e:
+        print(f"--- [DEBUG] ERROR in __main__ block: {e}")
+        traceback.print_exc()
+else:
+     print(f"--- [DEBUG] Script imported, __name__ is {__name__} ---")
+
+print("--- [DEBUG] main.py script finished ---") # 메인 블록 밖 로그
