@@ -1,5 +1,4 @@
 # --- 필요한 라이브러리 ---
-requirements.txt 
 Flask>=2.0
 gunicorn
 google-auth
