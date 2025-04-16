@@ -51,41 +51,30 @@ def handle_chat_event_logic(event):
 # Google Chat이 POST 요청을 보낼 엔드포인트('/')를 정의합니다.
 @app.route('/', methods=['POST'])
 def handle_post_request():
-    """HTTP POST 요청을 처리하고 챗봇 로직 함수를 호출합니다."""
-    print("--- POST request received ---")
+    """POST 요청을 받아 챗봇 로직 함수로 넘김"""
     try:
-        # 요청 본문(body)에서 JSON 데이터 파싱
+        # 요청 본문(body)에서 JSON 데이터 가져오기
         event_data = request.get_json()
-
-        # 데이터가 없거나 JSON 형식이 아니면 오류 반환
         if not event_data:
-            print("Error: No data received or not JSON")
-            return jsonify({'error': 'No data received or not JSON'}), 400 # Bad Request
+            print("Error: No data received or not JSON") # 오류 로그 추가
+            # 400 Bad Request 반환
+            return jsonify({'error': 'No data received or not JSON'}), 400
 
-        # 핵심 로직 함수 호출 및 결과 반환
+        # 챗봇 로직 함수 호출하고 결과 반환
         return handle_chat_event_logic(event_data)
 
     except Exception as e:
-        # 로직 처리 중 예상치 못한 오류 발생 시 처리
+        # 예상치 못한 오류 발생 시 로그 기록 및 오류 응답 반환
         print(f"Error handling POST request: {e}")
         traceback.print_exc() # 콘솔에 상세 오류 스택 출력
-        # Google Chat에는 일반적인 오류 메시지 반환 (HTTP 500)
-        return jsonify({'error': 'An internal error occurred while processing the event.'}), 500 # Internal Server Error
+        # 500 Internal Server Error 반환
+        return jsonify({'error': 'An internal error occurred'}), 500
 
-# --- 4. 서버 실행 (메인 블록) ---
-# 이 스크립트가 직접 실행될 때 (예: python main.py) Flask 개발 서버를 시작합니다.
+# --- 메인 실행 블록 ---
 if __name__ == "__main__":
-    print("--- Script running in __main__ block ---")
-    try:
-        # Cloud Run 환경에서는 PORT 환경 변수로 포트 번호가 주어집니다.
-        # 로컬 테스트 시에는 기본값 8080을 사용합니다.
-        port = int(os.environ.get("PORT", 8080))
-
-        print(f"--- Starting Flask development server on host 0.0.0.0, port {port} ---")
-        # host='0.0.0.0'은 컨테이너 외부(Cloud Run 환경) 또는 로컬 네트워크에서 접근 가능하게 합니다.
-        # debug=False 또는 생략: 운영 환경 권장 설정
-        app.run(host='0.0.0.0', port=port)
-
-    except Exception as e:
-        print(f"--- ERROR: Failed to start Flask server: {e} ---")
-        traceback.print_exc()
+    # Cloud Run이 제공하는 PORT 환경 변수 가져오기 (없으면 기본값 8080)
+    port = int(os.environ.get("PORT", 8080))
+    print(f"--- Starting Flask App on host 0.0.0.0 port {port} ---") # 시작 로그 추가
+    # 서버 실행: host='0.0.0.0' 은 컨테이너 외부에서 접근 가능하게 함
+    # debug=True는 개발 중에 유용하지만, 운영 환경에서는 False로 설정하거나 제거하는 것이 좋습니다.
+    app.run(host='0.0.0.0', port=port) # debug=True 제거 권장
