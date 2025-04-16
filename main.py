@@ -33,24 +33,9 @@ def handle_chat_event_logic(event):
 # --- 로직 함수 정의 후에 라우트 정의 ---
 @app.route('/', methods=['POST'])
 def handle_post_request():
-    """POST 요청을 받아 챗봇 로직 함수로 넘김"""
-    try:
-        # 요청 본문(body)에서 JSON 데이터 가져오기
-        event_data = request.get_json()
-        if not event_data:
-            print("Error: No data received or not JSON") # 오류 로그 추가
-            # 400 Bad Request 반환
-            return jsonify({'error': 'No data received or not JSON'}), 400
-
-        # 챗봇 로직 함수 호출하고 결과 반환
-        return handle_chat_event_logic(event_data)
-
-    except Exception as e:
-        # 예상치 못한 오류 발생 시 로그 기록 및 오류 응답 반환
-        print(f"Error handling POST request: {e}")
-        traceback.print_exc() # 콘솔에 상세 오류 스택 출력
-        # 500 Internal Server Error 반환
-        return jsonify({'error': 'An internal error occurred'}), 500
+    print("--- POST request received at '/' endpoint! ---")
+    # 요청 처리 로직 없이 그냥 성공 응답만 반환
+    return jsonify({'status': 'POST request received successfully'}), 200
 
 # --- 메인 실행 블록 ---
 if __name__ == "__main__":
